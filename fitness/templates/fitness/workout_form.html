@@ -1,0 +1,74 @@
+{% extends 'fitness/base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm border border-gray-100">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Организовать учёт новой тренировки</h2>
+    
+    <form method="POST" id="workoutForm" class="space-y-6">
+        {% csrf_token %}
+        
+        {% if workout_form.errors %}
+            <div class="p-3 bg-red-50 text-red-600 text-sm rounded border border-red-200">
+                Проверьте корректность числовых полей. Значения должны быть больше нуля.
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Дата занятия</label>
+                {{ workout_form.date }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Вид активности</label>
+                {{ workout_form.type }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Длительность (мин)</label>
+                {{ workout_form.duration_minutes }}
+            </div>
+        </div>
+
+        <div id="strengthSection" class="hidden border-t border-gray-100 pt-4">
+            <h3 class="text-md font-semibold text-gray-700 mb-3">Состав силовой тренировки (Упражнения)</h3>
+            <div id="exercisesContainer" class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-2 exercise-row">
+                    <input type="text" name="ex_name[]" placeholder="Название (напр. Присед)" class="px-2 py-1.5 border border-gray-300 rounded text-sm md:col-span-1">
+                    <input type="number" name="ex_sets[]" placeholder="Подходы" class="px-2 py-1.5 border border-gray-300 rounded text-sm" min="1">
+                    <input type="number" name="ex_reps[]" placeholder="Повторения" class="px-2 py-1.5 border border-gray-300 rounded text-sm" min="1">
+                    <input type="number" name="ex_weight[]" placeholder="Вес (кг)" step="0.5" class="px-2 py-1.5 border border-gray-300 rounded text-sm" min="0">
+                </div>
+            </div>
+            <button type="button" id="addExerciseBtn" class="mt-3 text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded hover:bg-gray-200 font-medium">+ Добавить позицию</button>
+        </div>
+
+        <div class="flex space-x-3 pt-4 border-t border-gray-100">
+            <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded font-semibold hover:bg-indigo-700 transition">Сохранить тренировку</button>
+            <a href="{% url 'dashboard' %}" class="bg-gray-100 text-gray-600 px-6 py-2 rounded font-semibold hover:bg-gray-200 transition">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    const typeSelect = document.querySelector('select[name="type"]');
+    const strengthSection = document.getElementById('strengthSection');
+    const container = document.getElementById('exercisesContainer');
+    const addBtn = document.getElementById('addExerciseBtn');
+
+    function toggleStrengthSection() {
+        // Показываем блок упражнений, если выбрана Силовая тренировка
+        if(typeSelect.options[typeSelect.selectedIndex].text === 'Силовая') {
+            strengthSection.classList.remove('hidden');
+        } else {
+            strengthSection.classList.add('hidden');
+        }
+    }
+
+    typeSelect.addEventListener('change', toggleStrengthSection);
+    window.addEventListener('DOMContentLoaded', toggleStrengthSection);
+
+    addBtn.addEventListener('click', () => {
+        const row = document.querySelector('.exercise-row').cloneNode(true);
+        row.querySelectorAll('input').forEach(input => input.value = '');
+        container.appendChild(row);
+    });
+</script>
+{% endblock %}

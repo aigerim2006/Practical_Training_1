@@ -1,0 +1,120 @@
+{% extends 'fitness/base.html' %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition">
+        <span class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Всего сожжено энергии</span>
+        <span class="text-4xl font-bold text-indigo-600 mt-2">{{ total_calories|floatformat:1 }} <span class="text-lg text-indigo-400">ккал</span></span>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition">
+        <span class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Время активности</span>
+        <span class="text-4xl font-bold text-green-500 mt-2">{{ total_duration }} <span class="text-lg text-green-400">мин</span></span>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition">
+        <span class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Проведено сессий</span>
+        <span class="text-4xl font-bold text-amber-500 mt-2">{{ workout_count }} <span class="text-lg text-amber-400">шт</span></span>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+        <h3 class="text-sm font-bold text-gray-600 mb-3 uppercase">Энергозатраты (ккал)</h3>
+        <canvas id="workoutsChart" class="w-full" height="180"></canvas>
+    </div>
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+        <h3 class="text-sm font-bold text-gray-600 mb-3 uppercase">Масса тела (кг)</h3>
+        <canvas id="weightChart" class="w-full" height="180"></canvas>
+    </div>
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+        <h3 class="text-sm font-bold text-gray-600 mb-3 uppercase">Поднятый тоннаж (кг)</h3>
+        <canvas id="tonnageChart" class="w-full" height="180"></canvas>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-gray-800">История тренировок</h3>
+            <a href="{% url 'add_workout' %}" class="text-sm text-indigo-600 hover:underline font-medium">+ Добавить</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-white text-gray-400 uppercase text-xs border-b border-gray-100">
+                    <tr>
+                        <th class="px-6 py-4 font-semibold">Дата</th>
+                        <th class="px-6 py-4 font-semibold">Тип</th>
+                        <th class="px-6 py-4 font-semibold">Время</th>
+                        <th class="px-6 py-4 font-semibold">Расход</th>
+                        <th class="px-6 py-4 font-semibold text-right">Действие</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for w in raw_workouts %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 font-medium text-gray-900">{{ w.date|date:"d.m.Y" }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">{{ w.type.name }}</span>
+                        </td>
+                        <td class="px-6 py-4">{{ w.duration_minutes }} мин</td>
+                        <td class="px-6 py-4 font-semibold text-indigo-500">{{ w.calories_burned }} ккал</td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="{% url 'delete_workout' w.id %}" class="text-red-400 hover:text-red-600 text-xs font-medium bg-red-50 px-2 py-1 rounded transition">Удалить</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">История пуста. Начните свою первую тренировку!</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 self-start">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Взвешивание</h3>
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Дата</label>
+                {{ weight_form.date }}
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Вес (кг)</label>
+                {{ weight_form.body_weight }}
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Заметка</label>
+                {{ weight_form.notes }}
+            </div>
+            <button type="submit" class="w-full bg-gray-900 text-white py-2.5 text-sm rounded-lg font-semibold hover:bg-gray-800 transition shadow-sm">Записать вес</button>
+        </form>
+    </div>
+</div>
+
+{{ chart_workouts|json_script:"workoutDataJson" }}
+{{ chart_weight|json_script:"weightDataJson" }}
+{{ chart_tonnage|json_script:"tonnageDataJson" }}
+
+<script>
+    const chartOptions = { responsive: true, plugins: { legend: { display: false } }, maintainAspectRatio: false };
+
+    const workoutData = JSON.parse(document.getElementById('workoutDataJson').textContent);
+    new Chart(document.getElementById('workoutsChart'), {
+        type: 'bar',
+        data: { labels: workoutData.dates, datasets: [{ data: workoutData.calories, backgroundColor: '#6366f1', borderRadius: 4 }] },
+        options: chartOptions
+    });
+
+    const weightData = JSON.parse(document.getElementById('weightDataJson').textContent);
+    new Chart(document.getElementById('weightChart'), {
+        type: 'line',
+        data: { labels: weightData.dates, datasets: [{ data: weightData.weights, borderColor: '#10b981', tension: 0.3, borderWidth: 3, pointBackgroundColor: '#10b981' }] },
+        options: chartOptions
+    });
+
+    const tonnageData = JSON.parse(document.getElementById('tonnageDataJson').textContent);
+    new Chart(document.getElementById('tonnageChart'), {
+        type: 'line',
+        data: { labels: tonnageData.dates, datasets: [{ data: tonnageData.tonnages, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.3, borderWidth: 3 }] },
+        options: chartOptions
+    });
+</script>
+{% endblock %}
