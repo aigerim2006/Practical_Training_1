@@ -1,0 +1,14 @@
+{% extends 'fitness/base.html' %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-100 text-center mt-12">
+    <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">!</div>
+    <h2 class="text-xl font-black text-slate-900">Удалить тренировку?</h2>
+    <p class="text-slate-400 mb-6 text-xs mt-1">Запись от <b>{{ workout.date|date:"d.m.Y" }}</b> ({{ workout.type.name }}) будет безвозвратно удалена из базы данных, а графики прогресса автоматически пересчитаны.</p>
+    
+    <form method="POST" class="flex space-x-4">
+        {% csrf_token %}
+        <a href="{% url 'dashboard' %}" class="flex-1 bg-slate-100 text-slate-700 py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition">Отмена</a>
+        <button type="submit" class="flex-1 bg-rose-500 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-rose-600 transition shadow-lg shadow-rose-600/20">Да, удалить</button>
+    </form>
+</div>
+{% endblock %}

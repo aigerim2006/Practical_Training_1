@@ -1,120 +1,133 @@
 {% extends 'fitness/base.html' %}
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition">
-        <span class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Всего сожжено энергии</span>
-        <span class="text-4xl font-bold text-indigo-600 mt-2">{{ total_calories|floatformat:1 }} <span class="text-lg text-indigo-400">ккал</span></span>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition duration-300">
+        <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Энергозатраты</span>
+            <span class="text-4xl font-black text-indigo-600 mt-2 block">{{ total_calories }} <span class="text-base font-normal text-slate-400">ккал</span></span>
+        </div>
+        <div class="absolute bottom-0 right-0 transform translate-x-4 translate-y-4 opacity-5 text-9xl font-black text-indigo-600 select-none">🔥</div>
     </div>
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition">
-        <span class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Время активности</span>
-        <span class="text-4xl font-bold text-green-500 mt-2">{{ total_duration }} <span class="text-lg text-green-400">мин</span></span>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition duration-300">
+        <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Время активности</span>
+            <span class="text-4xl font-black text-emerald-500 mt-2 block">{{ total_duration }} <span class="text-base font-normal text-slate-400">мин</span></span>
+        </div>
+        <div class="absolute bottom-0 right-0 transform translate-x-4 translate-y-4 opacity-5 text-9xl font-black text-emerald-500 select-none">⏱️</div>
     </div>
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition">
-        <span class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Проведено сессий</span>
-        <span class="text-4xl font-bold text-amber-500 mt-2">{{ workout_count }} <span class="text-lg text-amber-400">шт</span></span>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition duration-300">
+        <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Всего сессий</span>
+            <span class="text-4xl font-black text-amber-500 mt-2 block">{{ workout_count }} <span class="text-base font-normal text-slate-400">занятий</span></span>
+        </div>
+        <div class="absolute bottom-0 right-0 transform translate-x-4 translate-y-4 opacity-5 text-9xl font-black text-amber-500 select-none">💪</div>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-        <h3 class="text-sm font-bold text-gray-600 mb-3 uppercase">Энергозатраты (ккал)</h3>
-        <canvas id="workoutsChart" class="w-full" height="180"></canvas>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <h3 class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider">Динамика сожженных калорий</h3>
+        <div class="h-56"><canvas id="workoutsChart"></canvas></div>
     </div>
-    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-        <h3 class="text-sm font-bold text-gray-600 mb-3 uppercase">Масса тела (кг)</h3>
-        <canvas id="weightChart" class="w-full" height="180"></canvas>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <h3 class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider">Контроль массы тела (кг)</h3>
+        <div class="h-56"><canvas id="weightChart"></canvas></div>
     </div>
-    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-        <h3 class="text-sm font-bold text-gray-600 mb-3 uppercase">Поднятый тоннаж (кг)</h3>
-        <canvas id="tonnageChart" class="w-full" height="180"></canvas>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <h3 class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider">Динамика изменения веса снарядов (Тоннаж)</h3>
+        <div class="h-56"><canvas id="tonnageChart"></canvas></div>
     </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-    <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-            <h3 class="text-lg font-bold text-gray-800">История тренировок</h3>
-            <a href="{% url 'add_workout' %}" class="text-sm text-indigo-600 hover:underline font-medium">+ Добавить</a>
+    <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
+            <h3 class="text-base font-bold text-slate-900">Журнал тренировок</h3>
+            <a href="{% url 'add_workout' %}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700 hover:underline">+ Новая запись</a>
         </div>
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-gray-600">
-                <thead class="bg-white text-gray-400 uppercase text-xs border-b border-gray-100">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-white text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-100">
                     <tr>
-                        <th class="px-6 py-4 font-semibold">Дата</th>
-                        <th class="px-6 py-4 font-semibold">Тип</th>
-                        <th class="px-6 py-4 font-semibold">Время</th>
-                        <th class="px-6 py-4 font-semibold">Расход</th>
-                        <th class="px-6 py-4 font-semibold text-right">Действие</th>
+                        <th class="px-6 py-4 font-bold">Дата</th>
+                        <th class="px-6 py-4 font-bold">Тип активности</th>
+                        <th class="px-6 py-4 font-bold">Длительность</th>
+                        <th class="px-6 py-4 font-bold">Затраты</th>
+                        <th class="px-6 py-4 font-bold text-right">Действия</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
+                <tbody class="divide-y divide-slate-50">
                     {% for w in raw_workouts %}
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 font-medium text-gray-900">{{ w.date|date:"d.m.Y" }}</td>
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="px-6 py-4 font-semibold text-slate-900">{{ w.date|date:"d.m.Y" }}</td>
                         <td class="px-6 py-4">
-                            <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">{{ w.type.name }}</span>
+                            <span class="px-2.5 py-1 text-xs font-medium rounded-full {% if w.type.name == 'Силовая' %}bg-amber-50 text-amber-700{% else %}bg-sky-50 text-sky-700{% endif %}">
+                                {{ w.type.name }}
+                            </span>
                         </td>
-                        <td class="px-6 py-4">{{ w.duration_minutes }} мин</td>
-                        <td class="px-6 py-4 font-semibold text-indigo-500">{{ w.calories_burned }} ккал</td>
+                        <td class="px-6 py-4 text-slate-500">{{ w.duration_minutes }} мин.</td>
+                        <td class="px-6 py-4 font-bold text-indigo-600">{{ w.calories_burned }} ккал</td>
                         <td class="px-6 py-4 text-right">
-                            <a href="{% url 'delete_workout' w.id %}" class="text-red-400 hover:text-red-600 text-xs font-medium bg-red-50 px-2 py-1 rounded transition">Удалить</a>
+                            <a href="{% url 'delete_workout' w.id %}" class="inline-flex items-center text-xs font-semibold text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition">
+                                Удалить
+                            </a>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">История пуста. Начните свою первую тренировку!</td></tr>
+                    <tr><td colspan="5" class="px-6 py-12 text-center text-slate-400 font-medium">Данные не обнаружены. Добавьте тренировки, чтобы увидеть прогресс.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 self-start">
-        <h3 class="text-lg font-bold text-gray-800 mb-4">Взвешивание</h3>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 self-start">
+        <h3 class="text-base font-bold text-slate-900 mb-4">Взвешивание</h3>
         <form method="POST" class="space-y-4">
             {% csrf_token %}
             <div>
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Дата</label>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Дата</label>
                 {{ weight_form.date }}
             </div>
             <div>
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Вес (кг)</label>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Текущий вес (кг)</label>
                 {{ weight_form.body_weight }}
             </div>
             <div>
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Заметка</label>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Заметки</label>
                 {{ weight_form.notes }}
             </div>
-            <button type="submit" class="w-full bg-gray-900 text-white py-2.5 text-sm rounded-lg font-semibold hover:bg-gray-800 transition shadow-sm">Записать вес</button>
+            <button type="submit" class="w-full bg-slate-950 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-950/10 text-xs uppercase tracking-wider">Зафиксировать</button>
         </form>
     </div>
 </div>
 
-{{ chart_workouts|json_script:"workoutDataJson" }}
-{{ chart_weight|json_script:"weightDataJson" }}
-{{ chart_tonnage|json_script:"tonnageDataJson" }}
+{{ chart_workouts|json_script:"workoutData" }}
+{{ chart_weight|json_script:"weightData" }}
+{{ chart_tonnage|json_script:"tonnageData" }}
 
 <script>
-    const chartOptions = { responsive: true, plugins: { legend: { display: false } }, maintainAspectRatio: false };
+    const baseOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } };
 
-    const workoutData = JSON.parse(document.getElementById('workoutDataJson').textContent);
+    const wData = JSON.parse(document.getElementById('workoutData').textContent);
     new Chart(document.getElementById('workoutsChart'), {
         type: 'bar',
-        data: { labels: workoutData.dates, datasets: [{ data: workoutData.calories, backgroundColor: '#6366f1', borderRadius: 4 }] },
-        options: chartOptions
+        data: { labels: wData.dates, datasets: [{ data: wData.calories, backgroundColor: '#6366f1', borderRadius: 6, barThickness: 12 }] },
+        options: baseOptions
     });
 
-    const weightData = JSON.parse(document.getElementById('weightDataJson').textContent);
+    const weightData = JSON.parse(document.getElementById('weightData').textContent);
     new Chart(document.getElementById('weightChart'), {
         type: 'line',
-        data: { labels: weightData.dates, datasets: [{ data: weightData.weights, borderColor: '#10b981', tension: 0.3, borderWidth: 3, pointBackgroundColor: '#10b981' }] },
-        options: chartOptions
+        data: { labels: weightData.dates, datasets: [{ data: weightData.weights, borderColor: '#10b981', borderWidth: 3, pointBackgroundColor: '#10b981', tension: 0.3, fill: false }] },
+        options: baseOptions
     });
 
-    const tonnageData = JSON.parse(document.getElementById('tonnageDataJson').textContent);
+    const tonnageData = JSON.parse(document.getElementById('tonnageData').textContent);
     new Chart(document.getElementById('tonnageChart'), {
         type: 'line',
-        data: { labels: tonnageData.dates, datasets: [{ data: tonnageData.tonnages, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.3, borderWidth: 3 }] },
-        options: chartOptions
+        data: { labels: tonnageData.dates, datasets: [{ data: tonnageData.tonnages, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.05)', fill: true, borderWidth: 3, tension: 0.3 }] },
+        options: baseOptions
     });
 </script>
 {% endblock %}
