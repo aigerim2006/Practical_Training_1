@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-8">
+        <a href="{% url 'workouts:workout_list' %}" class="text-sm font-semibold text-slate-400 hover:text-indigo-500 transition flex items-center gap-1 mb-2">&larr; Назад в дневник</a>
+        <h2 class="text-3xl font-black text-slate-900">Регистрация активности</h2>
+    </div>
+
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+        
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+            <h3 class="text-sm font-bold text-slate-800 mb-6 uppercase tracking-wider">Базовые параметры</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% for field in form %}
+                <div class="flex flex-col">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <p class="text-xs text-rose-500 mt-1 font-medium">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Детали упражнений</h3>
+                <button type="button" id="btnAddRow" class="text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl transition">
+                    + Добавить строку
+                </button>
+            </div>
+            
+            <div id="exerciseRows" class="space-y-3">
+                <div class="grid grid-cols-12 gap-3 exercise-row group">
+                    <div class="col-span-12 md:col-span-5">
+                        <input type="text" name="ex_name[]" placeholder="Название (напр. Жим лежа)" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-medium transition">
+                    </div>
+                    <div class="col-span-4 md:col-span-2">
+                        <input type="number" name="ex_sets[]" placeholder="Подходы" min="1" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-medium text-center transition">
+                    </div>
+                    <div class="col-span-4 md:col-span-2">
+                        <input type="number" name="ex_reps[]" placeholder="Повторения" min="1" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-medium text-center transition">
+                    </div>
+                    <div class="col-span-3 md:col-span-2">
+                        <input type="number" step="0.5" name="ex_weight[]" placeholder="Вес (кг)" min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-medium text-center transition">
+                    </div>
+                    <div class="col-span-1 md:col-span-1 flex justify-center items-center">
+                        <button type="button" onclick="this.closest('.exercise-row').remove()" class="w-10 h-10 rounded-xl bg-slate-100 text-slate-400 hover:bg-rose-500 hover:text-white transition flex items-center justify-center font-black">&times;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-4">
+            <button type="submit" class="flex-1 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl shadow-xl shadow-indigo-600/30 transition duration-300 text-sm uppercase tracking-wider">
+                Сохранить в базу
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('btnAddRow').addEventListener('click', function() {
+    const container = document.getElementById('exerciseRows');
+    const firstRow = container.querySelector('.exercise-row');
+    const newRow = firstRow.cloneNode(true);
+    
+    // Очистка полей в новой строке
+    newRow.querySelectorAll('input').forEach(input => input.value = '');
+    
+    newRow.style.opacity = '0';
+    container.appendChild(newRow);
+    
+    setTimeout(() => {
+        newRow.style.transition = 'all 0.3s ease';
+        newRow.style.opacity = '1';
+    }, 10);
+});
+</script>
+{% endblock %}

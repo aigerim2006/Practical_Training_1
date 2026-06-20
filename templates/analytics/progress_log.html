@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-10">
+        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Журнал веса</h2>
+        <p class="text-sm text-slate-500 font-medium mt-1">Отслеживайте свои физические изменения.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="md:col-span-1">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 sticky top-6">
+                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Новый замер</h3>
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition text-xs uppercase tracking-widest mt-2">
+                        Сохранить
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="md:col-span-2">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-widest border-b border-slate-100">
+                        <tr>
+                            <th class="px-6 py-4 font-bold">Дата</th>
+                            <th class="px-6 py-4 font-bold">Вес (кг)</th>
+                            <th class="px-6 py-4 font-bold">Заметки</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for log in logs %}
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="px-6 py-4 font-bold text-slate-900">{{ log.date|date:"d.m.Y" }}</td>
+                            <td class="px-6 py-4 font-black text-emerald-500">{{ log.body_weight }}</td>
+                            <td class="px-6 py-4 text-xs">{{ log.notes|default:"—" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="px-6 py-10 text-center text-slate-400">Нет данных о весе.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

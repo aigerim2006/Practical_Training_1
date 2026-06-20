@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .django-form input {
+        width: 100%; padding: 1rem 1.25rem; background-color: #f8fafc; border: 1px solid #e2e8f0; 
+        border-radius: 1rem; outline: none; font-size: 0.875rem; font-weight: 500; transition: all 0.3s ease;
+    }
+    .django-form input:focus {
+        border-color: #6366f1; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+    .django-form label {
+        display: block; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; 
+        letter-spacing: 0.1em; margin-bottom: 0.5rem; margin-top: 1.25rem;
+    }
+    .django-form .helptext { font-size: 0.75rem; color: #94a3b8; margin-top: 0.5rem; display: block; }
+    .django-form ul.errorlist { color: #f43f5e; font-size: 0.75rem; font-weight: 600; margin-top: 0.5rem; list-style: none; padding: 0; }
+</style>
+
+<div class="min-h-[80vh] flex items-center justify-center">
+    <div class="bg-white p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 w-full max-w-md relative overflow-hidden group">
+        <div class="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition duration-700"></div>
+
+        <div class="text-center mb-8 relative z-10">
+            <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-indigo-600 shadow-inner">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+            </div>
+            <h2 class="text-3xl font-black text-slate-900 tracking-tight">С возвращением!</h2>
+            <p class="text-sm text-slate-500 mt-2 font-medium">Войдите, чтобы продолжить свои тренировки.</p>
+        </div>
+
+        <form method="post" class="django-form relative z-10">
+            {% csrf_token %}
+            {{ form }}
+            
+            <div class="mt-8">
+                <button type="submit" class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl shadow-lg transition duration-300 text-sm uppercase tracking-wider">
+                    Войти в систему
+                </button>
+            </div>
+        </form>
+
+        <p class="text-center text-sm text-slate-500 font-medium mt-8 relative z-10">
+            Нет аккаунта? <a href="{% url 'users:register' %}" class="text-indigo-600 hover:text-indigo-500 font-bold transition">Зарегистрироваться</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
