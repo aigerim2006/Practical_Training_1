@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View, ListView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Workout, ExerciseLog, WorkoutType
-from .forms import WorkoutForm
+from .models import Workout, ExerciseLog, WorkoutType, WorkoutSchedule
+from .forms import WorkoutForm, WorkoutScheduleForm
 from apps.analytics.models import UserProgress
 import datetime
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 class WorkoutListView(LoginRequiredMixin, ListView):
     model = Workout
@@ -68,3 +70,47 @@ class DeleteWorkoutView(LoginRequiredMixin, View):
         workout = get_object_or_404(Workout, pk=pk, user=request.user)
         workout.delete()
         return redirect('workouts:workout_list')
+    
+class ScheduleView(LoginRequiredMixin, ListView):
+    model = WorkoutSchedule
+    template_name = 'workouts/schedule.html'
+    context_object_name = 'schedule_items'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Подготавливаем список дней недели прямо здесь
+        context['days_of_week'] = [
+            (0, 'Понедельник'), (1, 'Вторник'), (2, 'Среда'), 
+            (3, 'Четверг'), (4, 'Пятница'), (5, 'Суббота'), (6, 'Воскресенье')
+        ]
+        return context
+    
+class DeleteScheduleView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        schedule = get_object_or_404(WorkoutSchedule, pk=pk, user=request.user)
+        return render(request, 'workouts/confirm_delete_schedule.html', {'schedule': schedule})
+
+    def post(self, request, pk):
+        schedule = get_object_or_404(WorkoutSchedule, pk=pk, user=request.user)
+        schedule.delete()
+        return redirect('workouts:schedule')
+
+@login_required
+def add_schedule_view(request):
+    if request.method == 'POST':
+        form = WorkoutScheduleForm(request.POST)
+        if form.is_valid():
+            schedule = form.save(commit=False)
+            schedule.user = request.user
+            schedule.save()
+            return redirect('workouts:schedule')
+    else:
+        form = WorkoutScheduleForm()
+    return render(request, 'workouts/add_schedule.html', {'form': form})
+
+@login_required
+@require_POST
+def delete_schedule_view(request, pk):
+    schedule = get_object_or_404(WorkoutSchedule, pk=pk, user=request.user)
+    schedule.delete()
+    return redirect('workouts:schedule')

@@ -266,24 +266,11 @@
                 <!-- Действия -->
                 <p class="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-3 pl-3">Быстрые действия</p>
                 
-                <a href="{% url 'workouts:workout_add' %}" class="btn-primary flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white font-bold relative shadow-lg shadow-indigo-500/20">
-                    <span class="relative z-10 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                        </svg>
-                        Новая тренировка
-                    </span>
-                    <span class="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 hover:opacity-100 transition-opacity duration-300"></span>
-                </a>
-
-                <!-- Дополнительные действия -->
-                <div class="grid grid-cols-2 gap-2 mt-3">
-                    <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white text-xs font-medium transition-all duration-300 border border-white/5 hover:border-white/10">
-                        📊 Прогресс
-                    </button>
-                    <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white text-xs font-medium transition-all duration-300 border border-white/5 hover:border-white/10">
-                        🏆 Достижения
-                    </button>
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="{% url 'workouts:workout_add' %}" class="px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white text-xs font-bold hover:scale-[1.02] transition-transform flex items-center justify-center text-center">🏋️ Новая</a>
+                    <a href="{% url 'analytics:progress_log' %}" class="px-4 py-3 bg-white/5 rounded-xl text-white/80 text-xs font-medium hover:bg-white/10 border border-white/5 flex items-center justify-center text-center">📊 Прогресс</a>
+                    <a href="{% url 'workouts:schedule' %}" class="px-4 py-3 bg-white/5 rounded-xl text-white/80 text-xs font-medium hover:bg-white/10 border border-white/5 flex items-center justify-center text-center">📅 План</a>
+                    <a href="{% url 'analytics:achievements' %}" class="px-4 py-3 bg-white/5 rounded-xl text-white/80 text-xs font-medium hover:bg-white/10 border border-white/5 flex items-center justify-center text-center">🏆 Успехи</a>
                 </div>
             </nav>
             {% endif %}

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 class WorkoutType(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -37,3 +38,16 @@ class ExerciseLog(models.Model):
     class Meta:
         verbose_name = 'Упражнение'
         verbose_name_plural = 'Упражнения'
+
+class WorkoutSchedule(models.Model):
+    DAYS_OF_WEEK = [
+        (0, 'Понедельник'), (1, 'Вторник'), (2, 'Среда'), 
+        (3, 'Четверг'), (4, 'Пятница'), (5, 'Суббота'), (6, 'Воскресенье')
+    ]
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    day_of_week = models.IntegerField(choices=DAYS_OF_WEEK)
+    exercise_name = models.CharField(max_length=200)
+    time = models.TimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['day_of_week', 'time']

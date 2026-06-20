@@ -1,13 +1,14 @@
 import json
 from django.shortcuts import render, redirect
-from django.views.generic import View
+from django.views.generic import View, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum, Count
 from apps.workouts.models import Workout
 from .models import UserProgress
-from .forms import ProgressForm
+from .forms import UserProgressForm
 import datetime
 from django.shortcuts import render
+
 
 class DashboardView(LoginRequiredMixin, View):
     def get(self, request):
@@ -48,20 +49,21 @@ class DashboardView(LoginRequiredMixin, View):
 
 class ProgressLogView(LoginRequiredMixin, View):
     def get(self, request):
-        logs = UserProgress.objects.filter(user=request.user)
-        form = ProgressForm(initial={'date': datetime.date.today()})
-        return render(request, 'analytics/progress_log.html', {'logs': logs, 'form': form})
+        form = UserProgressForm()
+        logs = UserProgress.objects.filter(user=request.user).order_by('-date')
+        return render(request, 'analytics/progress_log.html', {'form': form, 'logs': logs})
 
     def post(self, request):
-        form = ProgressForm(request.POST)
+        form = UserProgressForm(request.POST)
         if form.is_valid():
             progress = form.save(commit=False)
             progress.user = request.user
             progress.save()
             return redirect('analytics:progress_log')
-        logs = UserProgress.objects.filter(user=request.user)
-        return render(request, 'analytics/progress_log.html', {'logs': logs, 'form': form})
+        return render(request, 'analytics/progress_log.html', {'form': form})
     
+class AchievementsView(LoginRequiredMixin, TemplateView):
+    template_name = 'analytics/achievements.html'
 
 def home(request):
     return render(request, 'home.html')

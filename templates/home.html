@@ -151,19 +151,30 @@
                     </div>
                     <span class="text-sm font-medium text-white/80 uppercase tracking-wider">Быстрые действия</span>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <button class="px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white text-sm font-medium hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:scale-[1.02]">
+                 <div class="grid grid-cols-2 gap-3">
+                    <!-- Новая тренировка -->
+                    <a href="{% url 'workouts:workout_add' %}" 
+                    class="px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white text-sm font-medium hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:scale-[1.02] flex items-center justify-center">
                         🏋️ Новая тренировка
-                    </button>
-                    <button class="px-4 py-3 bg-white/10 rounded-xl text-white/80 text-sm font-medium hover:bg-white/20 transition-all hover:scale-[1.02] border border-white/5">
+                    </a>
+                    
+                    <!-- Прогресс -->
+                    <a href="{% url 'analytics:progress_log' %}" 
+                    class="px-4 py-3 bg-white/10 rounded-xl text-white/80 text-sm font-medium hover:bg-white/20 transition-all hover:scale-[1.02] border border-white/5 flex items-center justify-center">
                         📊 Прогресс
-                    </button>
-                    <button class="px-4 py-3 bg-white/10 rounded-xl text-white/80 text-sm font-medium hover:bg-white/20 transition-all hover:scale-[1.02] border border-white/5">
+                    </a>
+                    
+                    <!-- Расписание (замените 'workouts:schedule' на ваш реальный URL для расписания) -->
+                    <a href="{% url 'workouts:schedule' %}" 
+                    class="px-4 py-3 bg-white/10 rounded-xl text-white/80 text-sm font-medium hover:bg-white/20 transition-all hover:scale-[1.02] border border-white/5 flex items-center justify-center">
                         📅 Расписание
-                    </button>
-                    <button class="px-4 py-3 bg-white/10 rounded-xl text-white/80 text-sm font-medium hover:bg-white/20 transition-all hover:scale-[1.02] border border-white/5">
+                    </a>
+                    
+                    <!-- Достижения -->
+                    <a href="{% url 'analytics:achievements' %}" 
+                    class="px-4 py-3 bg-white/10 rounded-xl text-white/80 text-sm font-medium hover:bg-white/20 transition-all hover:scale-[1.02] border border-white/5 flex items-center justify-center">
                         🏆 Достижения
-                    </button>
+                    </a>
                 </div>
             </div>
 
