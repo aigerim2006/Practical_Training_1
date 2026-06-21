@@ -87,14 +87,15 @@ class ProfileView(LoginRequiredMixin, View):
     def post(self, request):
         profile = getattr(request.user, 'profile', None)
         u_form = UserUpdateForm(request.POST, instance=request.user)
-        p_form = ProfileUpdateForm(request.POST, instance=profile) if profile else None
+        # Добавляем request.FILES для обработки изображений
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile) if profile else None
 
         if u_form.is_valid() and (not p_form or p_form.is_valid()):
             u_form.save()
             if p_form:
                 p_form.save()
-            messages.success(request, 'Ваш профиль был успешно обновлен! 🔥')
+            messages.success(request, 'Профиль обновлен! 🔥')
             return redirect('users:profile')
         
-        messages.error(request, 'Ой! Проверьте правильность введенных данных.')
+        messages.error(request, 'Ошибка при сохранении.')
         return render(request, 'users/profile.html', self.get_context_data(request, u_form, p_form))

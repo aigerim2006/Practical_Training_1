@@ -15,9 +15,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.users',
     'apps.workouts',
     'apps.analytics',
+    'apps.users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +77,9 @@ LOGOUT_REDIRECT_URL = 'users:login'
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 JAZZMIN_SETTINGS = {
     "site_title": "Администрирование фитнес-проекта",

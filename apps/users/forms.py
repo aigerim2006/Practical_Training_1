@@ -73,9 +73,10 @@ class UserUpdateForm(forms.ModelForm):
         fields = ['email', 'first_name', 'last_name']
 
 class ProfileUpdateForm(forms.ModelForm):
+    avatar = forms.ImageField(required=False, label="Изменить фото")
     class Meta:
         model = UserProfile
-        fields = ['height_cm', 'target_weight']
+        fields = ['avatar', 'height_cm', 'target_weight']
         labels = {
             'height_cm': 'Рост (см)',
             'target_weight': 'Целевой вес (кг)',

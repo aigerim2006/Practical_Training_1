@@ -6,6 +6,7 @@ class UserProfile(models.Model):
     GENDER_CHOICES = [('M', 'Мужской'), ('F', 'Женский')]
     
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name="Аватар")
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, verbose_name="Пол")
     birth_date = models.DateField(verbose_name="Дата рождения")
     height_cm = models.FloatField(verbose_name="Рост (см)")
