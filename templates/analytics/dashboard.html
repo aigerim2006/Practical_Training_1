@@ -1,87 +1,220 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="mb-10">
-    <h2 class="text-4xl font-black text-slate-900 tracking-tight">Обзор статистики</h2>
-    <p class="text-sm text-slate-500 font-medium mt-1">Аналитика ваших показателей за последние 30 дней.</p>
+<div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+        <h2 class="text-4xl font-black text-white tracking-tight">Обзор статистики</h2>
+        <p class="text-sm text-white/40 font-medium mt-2">Аналитика ваших показателей за последние 30 дней.</p>
+    </div>
+    <div class="flex items-center gap-3">
+        <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Live Data
+        </span>
+    </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-xl transition duration-500">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/20">
         <div class="relative z-10">
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Сожжено энергии</p>
-            <h3 class="text-4xl font-black text-slate-900">{{ total_calories }} <span class="text-base font-semibold text-slate-400">ккал</span></h3>
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center mb-4 text-indigo-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
+            </div>
+            <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Сожжено энергии</p>
+            <h3 class="text-3xl font-black text-white group-hover:text-indigo-400 transition-colors">{{ total_calories }} <span class="text-sm font-semibold text-white/30">ккал</span></h3>
         </div>
-        <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-gradient-to-br from-indigo-100 to-transparent rounded-full opacity-50 group-hover:scale-150 transition duration-700"></div>
+        <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-gradient-to-br from-indigo-500/20 to-purple-500/0 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
     </div>
     
-    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-xl transition duration-500">
+    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-emerald-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/20">
         <div class="relative z-10">
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Всего тренировок</p>
-            <h3 class="text-4xl font-black text-slate-900">{{ total_workouts }} <span class="text-base font-semibold text-slate-400">сессий</span></h3>
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Тренировок за все время</p>
+            <h3 class="text-3xl font-black text-white group-hover:text-emerald-400 transition-colors">{{ total_workouts }} <span class="text-sm font-semibold text-white/30">сессий</span></h3>
         </div>
-        <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-gradient-to-br from-emerald-100 to-transparent rounded-full opacity-50 group-hover:scale-150 transition duration-700"></div>
+        <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-gradient-to-br from-emerald-500/20 to-teal-500/0 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
     </div>
 
-    <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-3xl shadow-lg shadow-slate-900/20 relative overflow-hidden flex flex-col justify-center">
-        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Быстрое действие</p>
-        <a href="{% url 'workouts:workout_add' %}" class="inline-flex items-center justify-center w-full py-3 px-4 bg-indigo-500 hover:bg-indigo-400 text-white font-bold rounded-xl transition duration-300 shadow-lg shadow-indigo-500/30">
-        Добавить тренировку &rarr;
-    </a>
+    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-rose-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-rose-500/20">
+        <div class="relative z-10">
+            <div class="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center mb-4 text-rose-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+            </div>
+            <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Тоннаж (30 дней)</p>
+            <h3 class="text-3xl font-black text-white group-hover:text-rose-400 transition-colors">{{ total_tonnage }} <span class="text-sm font-semibold text-white/30">кг</span></h3>
+        </div>
+        <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-gradient-to-br from-rose-500/20 to-pink-500/0 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
     </div>
+
+    <a href="{% url 'workouts:workout_add' %}" class="block bg-gradient-to-br from-indigo-600 to-purple-700 p-6 rounded-3xl shadow-lg shadow-indigo-500/20 relative overflow-hidden group hover:shadow-indigo-500/40 transition-all duration-500">
+        <div class="relative z-10 h-full flex flex-col items-center justify-center text-center">
+            <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-90 transition-transform duration-500">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-1">Новая тренировка</h3>
+            <p class="text-xs text-white/70 font-medium">Записать результаты</p>
+        </div>
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')] opacity-50"></div>
+    </a>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-        <h3 class="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-indigo-500"></span> Динамика энергозатрат (ккал)
-        </h3>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 relative">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></span> 
+                Энергозатраты
+            </h3>
+            <span class="text-xs text-white/40">ккал</span>
+        </div>
         <div class="h-64"><canvas id="caloriesChart"></canvas></div>
     </div>
     
-    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-        <h3 class="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-emerald-500"></span> Изменение массы тела (кг)
-        </h3>
-        <div class="h-64"><canvas id="weightChart"></canvas></div>
+    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 relative">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]"></span> 
+                Поднятый тоннаж
+            </h3>
+            <span class="text-xs text-white/40">кг</span>
+        </div>
+        <div class="h-64"><canvas id="tonnageChart"></canvas></div>
+    </div>
+
+    <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 relative lg:col-span-2">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span> 
+                Динамика массы тела
+            </h3>
+            <span class="text-xs text-white/40">кг</span>
+        </div>
+        <div class="h-72"><canvas id="weightChart"></canvas></div>
+    </div>
+</div>
+
+<div class="mb-10">
+    <h3 class="text-lg font-bold text-white mb-4">Последние записи</h3>
+    <div class="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden">
+        {% if recent_workouts %}
+            <div class="divide-y divide-white/5">
+                {% for w in recent_workouts %}
+                <a href="{% url 'workouts:workout_detail' w.pk %}" class="flex items-center justify-between p-5 hover:bg-white/5 transition-colors group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-indigo-500/50 group-hover:text-indigo-400 transition-colors">
+                            🏋️
+                        </div>
+                        <div>
+                            <h4 class="text-white font-bold text-sm">{{ w.type.name|default:"Тренировка" }}</h4>
+                            <p class="text-xs text-white/40 mt-1">{{ w.date|date:"d M Y" }} • {{ w.duration_minutes }} мин</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-sm font-bold text-indigo-400">{{ w.calories_burned }} ккал</span>
+                        <span class="text-xs text-white/30 group-hover:text-white/50 transition-colors flex items-center gap-1 justify-end mt-1">
+                            Подробнее <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="p-10 text-center">
+                <p class="text-white/40 mb-4">У вас пока нет записей о тренировках.</p>
+                <a href="{% url 'workouts:workout_add' %}" class="text-indigo-400 hover:text-indigo-300 font-medium text-sm">Создать первую тренировку &rarr;</a>
+            </div>
+        {% endif %}
     </div>
 </div>
 
 {{ w_dates_json|json_script:"wDates" }}
 {{ w_kcal_json|json_script:"wKcal" }}
+{{ w_tonnage_json|json_script:"wTonnage" }}
 {{ p_dates_json|json_script:"pDates" }}
 {{ p_weights_json|json_script:"pWeights" }}
 
 <script>
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
     const wDates = JSON.parse(document.getElementById('wDates').textContent || '[]');
     const wKcal = JSON.parse(document.getElementById('wKcal').textContent || '[]');
+    const wTonnage = JSON.parse(document.getElementById('wTonnage').textContent || '[]');
     const pDates = JSON.parse(document.getElementById('pDates').textContent || '[]');
     const pWeights = JSON.parse(document.getElementById('pWeights').textContent || '[]');
 
     Chart.defaults.font.family = "'Inter', sans-serif";
-    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.color = 'rgba(255, 255, 255, 0.4)';
+    Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
 
-    const chartOptions = { 
+    const commonOptions = { 
         responsive: true, 
         maintainAspectRatio: false, 
-        plugins: { legend: { display: false } },
+        plugins: { 
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(15, 12, 41, 0.9)',
+                titleColor: '#fff',
+                bodyColor: '#e2e8f0',
+                borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 12,
+                displayColors: false
+            }
+        },
         scales: { 
-            y: { border: {display: false}, grid: { color: '#f1f5f9' } },
+            y: { border: {display: false}, beginAtZero: true },
             x: { border: {display: false}, grid: { display: false } }
         }
     };
 
-    new Chart(document.getElementById('caloriesChart'), {
+    const ctxCal = document.getElementById('caloriesChart').getContext('2d');
+    const gradCal = ctxCal.createLinearGradient(0, 0, 0, 300);
+    gradCal.addColorStop(0, 'rgba(99, 102, 241, 0.8)');
+    gradCal.addColorStop(1, 'rgba(99, 102, 241, 0.1)');
+
+    new Chart(ctxCal, {
         type: 'bar',
-        data: { labels: wDates, datasets: [{ data: wKcal, backgroundColor: '#6366f1', borderRadius: 8, barThickness: 20 }] },
-        options: chartOptions
+        data: { labels: wDates, datasets: [{ data: wKcal, backgroundColor: gradCal, borderRadius: 6, barThickness: 'flex', maxBarThickness: 30 }] },
+        options: commonOptions
     });
 
-    new Chart(document.getElementById('weightChart'), {
-        type: 'line',
-        data: { labels: pDates, datasets: [{ data: pWeights, borderColor: '#10b981', borderWidth: 3, tension: 0.4, pointBackgroundColor: '#fff', pointBorderColor: '#10b981', pointRadius: 4 }] },
-        options: chartOptions
+    const ctxTon = document.getElementById('tonnageChart').getContext('2d');
+    const gradTon = ctxTon.createLinearGradient(0, 0, 0, 300);
+    gradTon.addColorStop(0, 'rgba(244, 63, 94, 0.8)');
+    gradTon.addColorStop(1, 'rgba(244, 63, 94, 0.1)');
+
+    new Chart(ctxTon, {
+        type: 'bar',
+        data: { labels: wDates, datasets: [{ data: wTonnage, backgroundColor: gradTon, borderRadius: 6, barThickness: 'flex', maxBarThickness: 30 }] },
+        options: commonOptions
     });
-})();
+
+    const ctxWeight = document.getElementById('weightChart').getContext('2d');
+    const gradWeight = ctxWeight.createLinearGradient(0, 0, 0, 300);
+    gradWeight.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+    gradWeight.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+    new Chart(ctxWeight, {
+        type: 'line',
+        data: { 
+            labels: pDates, 
+            datasets: [{ 
+                data: pWeights, 
+                borderColor: '#10b981', 
+                backgroundColor: gradWeight,
+                borderWidth: 3, 
+                tension: 0.4, 
+                fill: true,
+                pointBackgroundColor: '#0f0c29', 
+                pointBorderColor: '#10b981', 
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }] 
+        },
+        options: commonOptions
+    });
+});
 </script>
 {% endblock %}

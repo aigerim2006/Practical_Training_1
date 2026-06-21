@@ -11,3 +11,6 @@ class UserProgress(models.Model):
         verbose_name = 'Прогресс пользователя'
         verbose_name_plural = 'Прогресс пользователей'
         ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.date} ({self.body_weight}kg)"

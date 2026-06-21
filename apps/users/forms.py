@@ -62,3 +62,21 @@ class UserRegisterForm(TailwindFormMixin, forms.ModelForm):
         if age < 14 or age > 90:
             raise forms.ValidationError("Регистрация разрешена с 14 до 90 лет.")
         return birth_date
+    
+class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField(label="Email", required=True)
+    first_name = forms.CharField(label="Имя", required=False)
+    last_name = forms.CharField(label="Фамилия", required=False)
+
+    class Meta:
+        model = User
+        fields = ['email', 'first_name', 'last_name']
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['height_cm', 'target_weight']
+        labels = {
+            'height_cm': 'Рост (см)',
+            'target_weight': 'Целевой вес (кг)',
+        }

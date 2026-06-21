@@ -15,7 +15,23 @@ class WorkoutListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Workout.objects.filter(user=self.request.user).select_related('type')
+        # Базовый запрос
+        queryset = Workout.objects.filter(user=self.request.user).select_related('type')
+        
+        # Получаем ID типа из параметров URL (?type=1)
+        type_id = self.request.GET.get('type')
+        if type_id:
+            queryset = queryset.filter(type_id=type_id)
+            
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Передаем все типы тренировок для кнопок-фильтров
+        context['workout_types'] = WorkoutType.objects.all()
+        # Передаем активный фильтр, чтобы подсветить нужную кнопку
+        context['active_type'] = self.request.GET.get('type', '')
+        return context
 
 class WorkoutDetailView(LoginRequiredMixin, DetailView):
     model = Workout
