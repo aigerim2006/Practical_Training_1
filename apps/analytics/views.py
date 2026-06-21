@@ -14,40 +14,63 @@ class DashboardView(LoginRequiredMixin, View):
         today = datetime.date.today()
         month_ago = today - datetime.timedelta(days=30)
 
-        # Вытаскиваем тренировки за последние 30 дней
-        workouts = Workout.objects.filter(user=user, date__gte=month_ago).prefetch_related('exercises').order_by('date')
-        progress_logs = UserProgress.objects.filter(user=user, date__gte=month_ago).order_by('date')
+        workouts = Workout.objects.filter(user=user, date__gte=month_ago).prefetch_related('exercises')
+        progress_logs = UserProgress.objects.filter(user=user, date__gte=month_ago)
 
-        # Статистика за всё время (или можно поменять на month_ago, если нужна стата за месяц)
         total_stats = Workout.objects.filter(user=user).aggregate(
             sum_kcal=Sum('calories_burned'),
             count_id=Count('id')
         )
 
-        # Списки для графиков
-        workout_dates = [w.date.strftime('%d.%m') for w in workouts]
-        workout_calories = [w.calories_burned for w in workouts]
-        tonnages = [sum(e.get_tonnage() for e in w.exercises.all()) for w in workouts]
+        # 1. Генерируем массив всех 30 дней для непрерывной оси X
+        all_dates = [month_ago + datetime.timedelta(days=i) for i in range(31)]
+        
+        # 2. Группируем данные по датам для быстрого поиска
+        workout_data = {}
+        for w in workouts:
+            if w.date not in workout_data:
+                workout_data[w.date] = []
+            workout_data[w.date].append(w)
+            
+        progress_data = {p.date: p for p in progress_logs}
 
-        weight_dates = [p.date.strftime('%d.%m') for p in progress_logs]
-        weight_values = [p.body_weight for p in progress_logs]
+        # 3. Формируем списки для графиков
+        labels = []
+        energy = []
+        tonnages = []
+        weights = []
 
-        # Подсчет общего тоннажа за 30 дней
-        total_tonnage = sum(tonnages) if tonnages else 0
+        for d in all_dates:
+            labels.append(d.strftime('%d.%m'))
+            
+            # Энергия и тоннаж (если в один день было несколько тренировок — суммируем)
+            if d in workout_data:
+                day_workouts = workout_data[d]
+                day_kcal = sum(w.calories_burned or 0 for w in day_workouts)
+                day_tonnage = sum(sum(e.get_tonnage() for e in w.exercises.all()) for w in day_workouts)
+                energy.append(day_kcal)
+                tonnages.append(day_tonnage)
+            else:
+                energy.append(0)
+                tonnages.append(0)
+
+            # Вес: если замера нет, кладем None (чтобы график не падал в ноль)
+            if d in progress_data:
+                weights.append(float(progress_data[d].body_weight))
+            else:
+                weights.append(None)
 
         context = {
             'total_calories': round(total_stats['sum_kcal'] or 0.0, 1),
             'total_workouts': total_stats['count_id'] or 0,
-            'total_tonnage': round(total_tonnage, 1),
+            'total_tonnage': round(sum(tonnages), 1),
             
-            # Данные для Chart.js
-            'w_dates_json': json.dumps(workout_dates),
-            'w_kcal_json': json.dumps(workout_calories),
-            'w_tonnage_json': json.dumps(tonnages),
-            'p_dates_json': json.dumps(weight_dates),
-            'p_weights_json': json.dumps(weight_values),
+            # Передаем данные в JSON. В dashboard.html используй эти переменные!
+            'labels_list': json.dumps(labels),
+            'energy_data': json.dumps(energy),
+            'tonnage_data': json.dumps(tonnages),
+            'weight_data': json.dumps(weights),
             
-            # Передаем последние тренировки для истории
             'recent_workouts': Workout.objects.filter(user=user).order_by('-date')[:5]
         }
         return render(request, 'analytics/dashboard.html', context)

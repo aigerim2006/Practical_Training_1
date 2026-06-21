@@ -130,3 +130,12 @@ def delete_schedule_view(request, pk):
     schedule = get_object_or_404(WorkoutSchedule, pk=pk, user=request.user)
     schedule.delete()
     return redirect('workouts:schedule')
+
+class UpdateScheduleView(LoginRequiredMixin, UpdateView):
+    model = WorkoutSchedule
+    form_class = WorkoutScheduleForm
+    template_name = 'workouts/add_schedule.html' # Используем тот же шаблон, что и для добавления
+    success_url = '/workouts/schedule/'
+
+    def get_queryset(self):
+        return WorkoutSchedule.objects.filter(user=self.request.user)

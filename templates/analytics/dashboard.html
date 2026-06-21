@@ -128,19 +128,18 @@
     </div>
 </div>
 
-{{ w_dates_json|json_script:"wDates" }}
-{{ w_kcal_json|json_script:"wKcal" }}
-{{ w_tonnage_json|json_script:"wTonnage" }}
-{{ p_dates_json|json_script:"pDates" }}
-{{ p_weights_json|json_script:"pWeights" }}
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const wDates = JSON.parse(document.getElementById('wDates').textContent || '[]');
-    const wKcal = JSON.parse(document.getElementById('wKcal').textContent || '[]');
-    const wTonnage = JSON.parse(document.getElementById('wTonnage').textContent || '[]');
-    const pDates = JSON.parse(document.getElementById('pDates').textContent || '[]');
-    const pWeights = JSON.parse(document.getElementById('pWeights').textContent || '[]');
+    // ИДЕАЛЬНОЕ РЕШЕНИЕ: Оборачиваем в кавычки и парсим с escapejs. 
+    // VS Code доволен (видит строку), браузер доволен (получает чистый JSON).
+    const labels = JSON.parse('{{ labels_list|default:"[]"|escapejs }}');
+    const energyData = JSON.parse('{{ energy_data|default:"[]"|escapejs }}');
+    const tonnageData = JSON.parse('{{ tonnage_data|default:"[]"|escapejs }}');
+    const weightData = JSON.parse('{{ weight_data|default:"[]"|escapejs }}');
+
+    // Останавливаемся, если данных для оси Х совсем нет
+    if (!labels || labels.length === 0) return;
 
     Chart.defaults.font.family = "'Inter', sans-serif";
     Chart.defaults.color = 'rgba(255, 255, 255, 0.4)';
@@ -168,6 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // График энергозатрат
     const ctxCal = document.getElementById('caloriesChart').getContext('2d');
     const gradCal = ctxCal.createLinearGradient(0, 0, 0, 300);
     gradCal.addColorStop(0, 'rgba(99, 102, 241, 0.8)');
@@ -175,10 +175,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     new Chart(ctxCal, {
         type: 'bar',
-        data: { labels: wDates, datasets: [{ data: wKcal, backgroundColor: gradCal, borderRadius: 6, barThickness: 'flex', maxBarThickness: 30 }] },
+        data: { labels: labels, datasets: [{ data: energyData, backgroundColor: gradCal, borderRadius: 6, barThickness: 'flex', maxBarThickness: 30 }] },
         options: commonOptions
     });
 
+    // График тоннажа
     const ctxTon = document.getElementById('tonnageChart').getContext('2d');
     const gradTon = ctxTon.createLinearGradient(0, 0, 0, 300);
     gradTon.addColorStop(0, 'rgba(244, 63, 94, 0.8)');
@@ -186,10 +187,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     new Chart(ctxTon, {
         type: 'bar',
-        data: { labels: wDates, datasets: [{ data: wTonnage, backgroundColor: gradTon, borderRadius: 6, barThickness: 'flex', maxBarThickness: 30 }] },
+        data: { labels: labels, datasets: [{ data: tonnageData, backgroundColor: gradTon, borderRadius: 6, barThickness: 'flex', maxBarThickness: 30 }] },
         options: commonOptions
     });
 
+    // График веса
     const ctxWeight = document.getElementById('weightChart').getContext('2d');
     const gradWeight = ctxWeight.createLinearGradient(0, 0, 0, 300);
     gradWeight.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
@@ -198,18 +200,19 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(ctxWeight, {
         type: 'line',
         data: { 
-            labels: pDates, 
+            labels: labels, 
             datasets: [{ 
-                data: pWeights, 
+                data: weightData, 
                 borderColor: '#10b981', 
                 backgroundColor: gradWeight,
                 borderWidth: 3, 
                 tension: 0.4, 
                 fill: true,
+                spanGaps: true, // Соединяет точки даже при пропущенных днях
                 pointBackgroundColor: '#0f0c29', 
                 pointBorderColor: '#10b981', 
                 pointBorderWidth: 2,
-                pointRadius: 5,
+                pointRadius: 4,
                 pointHoverRadius: 7
             }] 
         },

@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import WorkoutListView, WorkoutDetailView, AddWorkoutView, DeleteWorkoutView, ScheduleView, add_schedule_view, DeleteScheduleView
+from .views import (WorkoutListView, WorkoutDetailView, AddWorkoutView, 
+                    DeleteWorkoutView, ScheduleView, add_schedule_view, 
+                    DeleteScheduleView, UpdateScheduleView) # Импортируем UpdateView
 
 app_name = 'workouts'
 
@@ -11,4 +13,5 @@ urlpatterns = [
     path('schedule/', ScheduleView.as_view(), name='schedule'),
     path('schedule/add/', add_schedule_view, name='add_schedule'),
     path('schedule/<int:pk>/delete/', DeleteScheduleView.as_view(), name='delete_schedule'),
+    path('schedule/<int:pk>/edit/', UpdateScheduleView.as_view(), name='edit_schedule'), # Новый путь
 ]
