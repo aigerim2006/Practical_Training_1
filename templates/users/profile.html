@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <style>
     /* Стили Glassmorphism */
-    .django-form input { 
+    .django-form input:not([type="file"]) { 
         width: 100%; padding: 0.875rem 1.25rem; background-color: rgba(255, 255, 255, 0.05); 
         border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; outline: none; 
         font-size: 0.875rem; font-weight: 500; color: white; transition: all 0.3s ease; 
@@ -18,7 +19,7 @@
     .django-form ul.errorlist { color: #f43f5e; font-size: 0.75rem; font-weight: 600; margin-top: 0.5rem; list-style: none; padding: 0; }
 </style>
 
-<div class="max-w-6xl mx-auto">
+<div class="pt-17 max-w-7xl mx-auto px-4 py-8">
     {% if messages %}
     <div class="mb-8 space-y-4">
         {% for message in messages %}
@@ -39,7 +40,7 @@
                     <div class="relative w-28 h-28 mt-4 mb-5">
                         <label for="id_avatar" class="cursor-pointer w-full h-full rounded-full block overflow-hidden border-2 border-white/10 hover:border-indigo-500 transition-all">
                             {% if profile.avatar %}
-                                <img src="{{ profile.avatar.url }}" class="w-full h-full object-cover">
+                                <img src="{{ profile.avatar.url }}?t={{ profile.created_at|date:'U' }}" class="w-full h-full object-cover">
                             {% else %}
                                 <div class="w-full h-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-4xl font-black text-white uppercase shadow-inner">
                                     {{ user.username|make_list|first }}
@@ -47,7 +48,7 @@
                             {% endif %}
                             <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity text-[10px] font-bold uppercase text-white">Сменить</div>
                         </label>
-                        <input type="file" name="avatar" id="id_avatar" class="hidden">
+                        <input type="file" name="avatar" id="id_avatar" class="hidden" onchange="this.form.submit()">
                     </div>
                     
                     <h3 class="text-2xl font-black text-white relative z-10">{{ user.first_name|default:user.username }} {{ user.last_name }}</h3>
@@ -67,12 +68,15 @@
                                 {{ field.errors }}
                             </div>
                         {% endfor %}
+                        
                         {% for field in p_form %}
-                            <div>
-                                {{ field.label_tag }}
-                                {{ field }}
-                                {{ field.errors }}
-                            </div>
+                            {% if field.name != 'avatar' %}
+                                <div>
+                                    {{ field.label_tag }}
+                                    {{ field }}
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
                         {% endfor %}
                     </div>
 

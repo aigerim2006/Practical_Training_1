@@ -1,37 +1,174 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <div class="mb-10">
-        <h2 class="text-4xl font-black text-white tracking-tight">Достижения</h2>
-        <p class="text-slate-400 mt-2">Ваши личные рекорды и пройденный путь.</p>
+
+<div class="pt-17 max-w-7xl mx-auto px-4 py-8">
+    
+    <div class="relative bg-gradient-to-r from-indigo-950/40 via-purple-950/20 to-transparent border border-white/5 p-8 rounded-3xl backdrop-blur-xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="space-y-2 text-center md:text-left relative z-10">
+            <span class="text-xs font-black tracking-[0.25em] text-indigo-400 uppercase">Система достижений</span>
+            <h2 class="text-4xl md:text-5xl font-black text-white tracking-tight">Зал Славы PROFIT</h2>
+            <p class="text-white/40 font-medium text-sm md:text-base">Превращайте пот и усилия в цифровые трофеи и развивайте свой ранг.</p>
+        </div>
+
+        <div class="bg-black/40 border border-white/5 p-6 rounded-2xl flex items-center gap-5 min-w-[280px] shadow-inner relative z-10">
+            <div class="relative flex items-center justify-center">
+                <svg class="w-20 h-20 transform -rotate-90">
+                    <circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,0.03)" stroke-width="6" fill="transparent"/>
+                    <circle id="levelCircle" cx="40" cy="40" r="34" stroke="url(#levelGradient)" stroke-width="6" fill="transparent"
+                            stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+                    <defs>
+                        <linearGradient id="levelGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#6366f1" />
+                            <stop offset="100%" stop-color="#d946ef" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="absolute text-center">
+                    <span class="block text-2xl font-black text-white leading-none">{{ user_level }}</span>
+                    <span class="text-[9px] text-white/40 font-bold uppercase tracking-wider">Уровень</span>
+                </div>
+            </div>
+            <div class="space-y-1 flex-1">
+                <div class="flex justify-between items-baseline">
+                    <span class="text-xs font-black uppercase tracking-wider bg-gradient-to-r {{ rank_color }} bg-clip-text text-transparent">{{ rank_name }}</span>
+                    <span class="text-[10px] text-white/40 font-bold">{{ xp_in_current_level }}/{{ xp_for_next_level }} XP</span>
+                </div>
+                <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                    <div id="levelProgressBar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-1000 w-0"></div>
+                </div>
+                <p class="text-[10px] text-white/30 font-medium">Всего заработано: {{ total_xp }} XP</p>
+            </div>
+        </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white/5 border border-white/10 p-6 rounded-3xl hover:bg-white/10 transition-all">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-2xl">🔥</div>
-                <div>
-                    <h3 class="font-bold text-white">Первая тренировка</h3>
-                    <p class="text-xs text-white/50">Выполнен 01.06.2026</p>
-                </div>
-            </div>
-            <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                <div class="bg-indigo-500 h-full w-full"></div>
-            </div>
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/5 pb-4">
+        <div class="flex gap-2 bg-white/5 p-1 rounded-xl border border-white/5">
+            <button onclick="filterAchievements('all')" id="btn-all" class="tab-btn px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">Все</button>
+            <button onclick="filterAchievements('Активность')" id="btn-Активность" class="tab-btn px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all text-white/60 hover:text-white">Активность</button>
+            <button onclick="filterAchievements('Сила')" id="btn-Сила" class="tab-btn px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all text-white/60 hover:text-white">Сила</button>
+            <button onclick="filterAchievements('Выносливость')" id="btn-Выносливость" class="tab-btn px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all text-white/60 hover:text-white">Выносливость</button>
         </div>
+        <div class="text-xs font-bold text-white/40 uppercase tracking-widest bg-white/5 border border-white/5 px-4 py-2 rounded-xl">
+            Выполнено трофеев: <span class="text-emerald-400 font-black">{{ unlocked_count }}</span> из {{ total_count }}
+        </div>
+    </div>
 
-        <div class="bg-white/5 border border-white/10 p-6 rounded-3xl opacity-60">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-slate-700/50 flex items-center justify-center text-2xl">⚡</div>
-                <div>
-                    <h3 class="font-bold text-white">10 тренировок</h3>
-                    <p class="text-xs text-white/50">В процессе...</p>
+    <div id="achievements-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        {% for achievement in achievements %}
+        <div class="achievement-card group relative rounded-3xl border transition-all duration-500 overflow-hidden {% if achievement.is_unlocked %}bg-white/[0.03] border-white/10{% else %}bg-white/[0.01] border-white/[0.03] opacity-55{% endif %}" 
+             data-category="{{ achievement.category }}">
+            
+            {% if achievement.is_unlocked %}
+            <div class="absolute -inset-0.5 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-xl pointer-events-none"></div>
+            {% endif %}
+
+            <div class="p-6 relative z-10 flex flex-col justify-between h-full space-y-6">
+                
+                <div class="flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner transition-transform duration-500 group-hover:scale-110 relative
+                        {% if achievement.is_unlocked %} bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-white border border-indigo-500/30 {% else %} bg-white/5 text-white/20 filter grayscale {% endif %}">
+                        {{ achievement.icon }}
+                        
+                        {% if not achievement.is_unlocked %}
+                        <span class="absolute -bottom-1 -right-1 bg-zinc-900 border border-white/10 w-5 h-5 rounded-full flex items-center justify-center text-[10px]">🔒</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="space-y-1 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h3 class="font-bold text-lg {% if achievement.is_unlocked %}text-white{% else %}text-white/40{% endif %} transition-colors group-hover:text-indigo-400">
+                                {{ achievement.title }}
+                            </h3>
+                            <span class="text-[9px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider bg-white/5 border border-white/5 text-white/30">
+                                {{ achievement.category }}
+                            </span>
+                        </div>
+                        <p class="text-sm {% if achievement.is_unlocked %}text-white/50{% else %}text-white/20{% endif %} font-medium leading-relaxed">
+                            {{ achievement.description }}
+                        </p>
+                    </div>
+
+                    <div class="text-right">
+                        <span class="text-[10px] font-black px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 uppercase tracking-wider">
+                            +{{ achievement.reward_xp }} XP
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                <div class="bg-emerald-500 h-full w-[40%]"></div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-xs font-bold">
+                        <span class="{% if achievement.is_unlocked %}text-indigo-400{% else %}text-white/20{% endif %}">
+                            {% if achievement.is_unlocked %} 🎉 Завершено {% else %} 🚀 В процессе {% endif %}
+                        </span>
+                        <span class="text-white/40 font-mono">
+                            {{ achievement.current|default:0 }} / {{ achievement.target }}
+                        </span>
+                    </div>
+                    
+                    <div class="w-full bg-black/40 h-2 rounded-full border border-white/5 p-[1px] overflow-hidden">
+                        <div class="achievement-progress-bar h-full rounded-full transition-all duration-1000 bg-gradient-to-r {% if achievement.is_unlocked %}from-indigo-500 via-purple-500 to-pink-500{% else %}from-zinc-700 to-zinc-600{% endif %} w-0"
+                             data-progress="{{ achievement.progress_percent|default:0 }}">
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
+        {% endfor %}
     </div>
 </div>
+
+<script>
+// Безопасное назначение динамических стилей через JS (убирает 100% ошибок линтера VS Code)
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Анимация кругового прогресс-бара уровня
+    const percent = Math.min(Math.max(parseInt("{{ level_progress_percent|default:0 }}"), 0), 100);
+    const circle = document.getElementById("levelCircle");
+    if (circle) {
+        const circumference = 213.6;
+        circle.style.strokeDashoffset = circumference - (circumference * percent / 100);
+    }
+
+    // 2. Анимация линейного прогресс-бара уровня
+    const levelBar = document.getElementById("levelProgressBar");
+    if (levelBar) {
+        levelBar.style.width = `${percent}%`;
+    }
+
+    // 3. Анимация прогресс-баров для каждой карточки достижений
+    document.querySelectorAll('.achievement-progress-bar').forEach(bar => {
+        const cardProgress = Math.min(Math.max(parseInt(bar.getAttribute('data-progress') || "0"), 0), 100);
+        bar.style.width = `${cardProgress}%`;
+    });
+});
+
+// Клиентская фильтрация карточек по категориям
+function filterAchievements(category) {
+    const cards = document.querySelectorAll('.achievement-card');
+    const buttons = document.querySelectorAll('.tab-btn');
+    
+    buttons.forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/20');
+        btn.classList.add('text-white/60');
+    });
+    
+    const activeBtn = document.getElementById(`btn-${category}`);
+    if (activeBtn) {
+        activeBtn.classList.remove('text-white/60');
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/20');
+    }
+
+    cards.forEach(card => {
+        if (category === 'all' || card.getAttribute('data-category') === category) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+
 {% endblock %}

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="pt-17 max-w-7xl mx-auto px-4 py-8"></div>
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
     <div>
         <h2 class="text-4xl font-black text-white tracking-tight flex items-center gap-3">
@@ -106,6 +107,13 @@
             <a href="{% url 'workouts:workout_detail' workout.pk %}" class="flex-1 py-3 text-center text-xs font-bold text-white bg-white/5 rounded-xl hover:bg-indigo-600 hover:text-white hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all duration-300 border border-white/10 hover:border-indigo-500">
                 Смотреть детали
             </a>
+            
+            <a href="{% url 'workouts:workout_edit' workout.pk %}" class="p-3 text-white/50 bg-white/5 rounded-xl hover:bg-amber-500 hover:text-white hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all duration-300 border border-white/10 hover:border-amber-500" title="Редактировать">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                </svg>
+            </a>
+
             <form action="{% url 'workouts:workout_delete' workout.pk %}" method="post" class="flex-none" onsubmit="return confirm('Вы уверены, что хотите удалить эту тренировку? Это действие необратимо.');">
                 {% csrf_token %}
                 <button type="submit" class="p-3 text-white/50 bg-white/5 rounded-xl hover:bg-rose-500 hover:text-white hover:shadow-[0_0_20px_rgba(244,63,94,0.4)] transition-all duration-300 border border-white/10 hover:border-rose-500" title="Удалить">

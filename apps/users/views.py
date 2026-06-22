@@ -85,17 +85,20 @@ class ProfileView(LoginRequiredMixin, View):
         return render(request, 'users/profile.html', self.get_context_data(request))
 
     def post(self, request):
-        profile = getattr(request.user, 'profile', None)
-        u_form = UserUpdateForm(request.POST, instance=request.user)
-        # Добавляем request.FILES для обработки изображений
-        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile) if profile else None
-
-        if u_form.is_valid() and (not p_form or p_form.is_valid()):
-            u_form.save()
-            if p_form:
-                p_form.save()
-            messages.success(request, 'Профиль обновлен! 🔥')
-            return redirect('users:profile')
+        # 1. Получаем или создаем профиль, если его вдруг нет
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
         
-        messages.error(request, 'Ошибка при сохранении.')
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save() # Теперь это точно сработает
+            messages.success(request, 'Профиль успешно обновлен!')
+            return redirect('users:profile')
+        else:
+            # Вывод ошибок, если валидация не прошла
+            print("Ошибки формы:", p_form.errors)
+            messages.error(request, 'Ошибка при сохранении данных.')
+            
         return render(request, 'users/profile.html', self.get_context_data(request, u_form, p_form))

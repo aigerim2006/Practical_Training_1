@@ -1,72 +1,254 @@
 {% extends 'base.html' %}
 {% block content %}
-<style>
-    /* Кастомная стилизация полей формы под темную тему */
-    .dark-form input, .dark-form textarea, .dark-form select {
-        width: 100%; padding: 0.875rem 1.25rem; 
-        background-color: rgba(255, 255, 255, 0.05); 
-        border: 1px solid rgba(255, 255, 255, 0.1); 
-        border-radius: 1rem; outline: none; font-size: 0.875rem; 
-        color: white; transition: all 0.3s ease;
-    }
-    .dark-form input:focus, .dark-form textarea:focus {
-        border-color: #10b981; background-color: rgba(255, 255, 255, 0.1); 
-        box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
-    }
-</style>
 
-<div class="max-w-5xl mx-auto">
-    <div class="mb-10">
-        <h2 class="text-4xl font-black text-white tracking-tight">Журнал веса</h2>
-        <p class="text-sm text-white/40 font-medium mt-1">Отслеживайте свои физические изменения.</p>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="max-w-7xl mx-auto px-4 py-8 bg-[#090a10]/20 min-h-screen">
+    
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4 relative">
+        <div class="absolute -top-10 -left-10 w-48 h-48 bg-indigo-500/5 rounded-full blur-[80px] pointer-events-none"></div>
+        <div class="relative z-10">
+            <h2 class="text-4xl font-black text-white tracking-tight bg-gradient-to-r from-white via-white to-white/50 bg-clip-text text-transparent">Аналитика прогресса</h2>
+            <p class="text-xs md:text-sm text-white/40 font-medium mt-1.5">Контролируйте состав тела, анализируйте пики и отслеживайте тренды изменений.</p>
+        </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        <div class="bg-[#11131e]/60 backdrop-blur-xl p-6 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-indigo-500/30 transition-all duration-300">
+            <div class="absolute -right-4 -bottom-4 text-white/[0.02] group-hover:text-white/[0.04] text-7xl font-black select-none transition-all duration-500">⚖️</div>
+            <p class="text-[10px] font-bold text-white/30 uppercase tracking-widest">Текущий вес</p>
+            <h4 class="text-3xl font-black text-white mt-3 tracking-tight">
+                <span id="kpi-current">--</span> <span class="text-sm font-medium text-white/40 ml-0.5">кг</span>
+            </h4>
+            <div class="w-full h-[2px] bg-indigo-500/20 absolute bottom-0 left-0"></div>
+        </div>
+
+        <div class="bg-[#11131e]/60 backdrop-blur-xl p-6 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-white/15 transition-all duration-300">
+            <p class="text-[10px] font-bold text-white/30 uppercase tracking-widest">Общий прогресс</p>
+            <h4 id="kpi-diff-container" class="text-3xl font-black mt-3 tracking-tight text-white/60">
+                <span id="kpi-diff">0</span> <span class="text-sm font-medium opacity-50 ml-0.5">кг</span>
+            </h4>
+            <p class="text-[10px] text-white/30 mt-1.5 flex items-center gap-1"><span class="w-1 h-1 rounded-full bg-white/20"></span> с первого замера</p>
+        </div>
+
+        <div class="bg-[#11131e]/60 backdrop-blur-xl p-6 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-white/15 transition-all duration-300">
+            <p class="text-[10px] font-bold text-white/30 uppercase tracking-widest">Пики (Мин / Макс)</p>
+            <h4 class="text-2xl font-black text-white mt-3.5 tracking-tight">
+                <span id="kpi-min" class="text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.1)]">--</span> 
+                <span class="text-white/20 font-normal mx-1.5">/</span> 
+                <span id="kpi-max" class="text-rose-400 drop-shadow-[0_0_10px_rgba(251,113,133,0.1)]">--</span>
+                <span class="text-xs font-normal text-white/40 ml-1">кг</span>
+            </h4>
+        </div>
+
+        <div class="bg-[#11131e]/60 backdrop-blur-xl p-6 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-indigo-500/30 transition-all duration-300">
+            <p class="text-[10px] font-bold text-white/30 uppercase tracking-widest">Всего замеров</p>
+            <h4 class="text-3xl font-black text-indigo-400 mt-3 tracking-tight drop-shadow-[0_0_15px_rgba(129,140,248,0.15)]">
+                {{ logs|length }} <span class="text-xs font-normal text-white/40 ml-0.5">записей</span>
+            </h4>
+            <div class="w-full h-[2px] bg-purple-500/20 absolute bottom-0 left-0"></div>
+        </div>
+    </div>
+
+    <div class="bg-[#11131e]/60 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 mb-10 shadow-2xl relative">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+                <h3 class="text-xs font-bold text-white uppercase tracking-widest pl-1">Временная шкала колебаний веса</h3>
+            </div>
+            <div class="flex bg-white/[0.03] p-1 rounded-xl border border-white/5 self-start sm:self-auto">
+                <button class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg text-white bg-white/10 transition-all">Всё время</button>
+                <button class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg text-white/40 hover:text-white transition-all">30 дней</button>
+                <button class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg text-white/40 hover:text-white transition-all">7 дней</button>
+            </div>
+        </div>
         
-        <div class="md:col-span-1">
-            <div class="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 sticky top-6 overflow-hidden">
-                <div class="absolute -top-10 -left-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-6 relative z-10">Новый замер</h3>
+        {% load l10n %}
+        <div class="w-full h-64 md:h-80">
+            <canvas id="weightTrendChart" 
+                    data-labels='{% if chart_labels %}{{ chart_labels|safe }}{% else %}[{% for log in logs reversed %}"{{ log.date|date:"d.m" }}"{% if not forloop.last %},{% endif %}{% endfor %}]{% endif %}' 
+                    data-weights='{% if chart_data %}{{ chart_data|safe }}{% else %}[{% for log in logs reversed %}{{ log.body_weight|unlocalize }}{% if not forloop.last %},{% endif %}{% endfor %}]{% endif %}'>
+            </canvas>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        <div class="lg:col-span-1">
+            <div class="bg-[#11131e]/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 sticky top-6 overflow-hidden shadow-2xl">
+                <div class="absolute -top-14 -left-14 w-36 h-36 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 
-                <form method="post" class="space-y-4 dark-form relative z-10">
+                <h3 class="text-xs font-bold text-white uppercase tracking-widest mb-6 border-b border-white/5 pb-3">Новая запись</h3>
+                
+                <form method="post" class="space-y-5 relative z-10">
                     {% csrf_token %}
                     {% for field in form %}
-                    <div>
-                        <label class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">{{ field.label }}</label>
-                        {{ field }}
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">{{ field.label }}</label>
+                        <div class="relative w-full 
+                            [&_input]:w-full [&_input]:bg-white/[0.02] [&_input]:border [&_input]:border-white/10 [&_input]:rounded-xl [&_input]:px-4 [&_input]:py-3 [&_input]:text-sm [&_input]:text-white [&_input]:placeholder-white/20 [&_input]:transition-all
+                            [&_input:focus]:bg-white/[0.05] [&_input:focus]:border-indigo-500 [&_input:focus]:ring-4 [&_input:focus]:ring-indigo-500/10 [&_input:focus]:outline-none
+                            [&_textarea]:w-full [&_textarea]:bg-white/[0.02] [&_textarea]:border [&_textarea]:border-white/10 [&_textarea]:rounded-xl [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:text-sm [&_textarea]:text-white [&_textarea]:placeholder-white/20 [&_textarea]:transition-all [&_textarea]:h-20
+                            [&_textarea:focus]:bg-white/[0.05] [&_textarea:focus]:border-indigo-500 [&_textarea:focus]:ring-4 [&_textarea:focus]:ring-indigo-500/10 [&_textarea:focus]:outline-none">
+                            {{ field }}
+                        </div>
+                        {% if field.errors %}
+                        <p class="text-xs text-rose-400 mt-1 pl-1 font-medium">{{ field.errors.as_text }}</p>
+                        {% endif %}
                     </div>
                     {% endfor %}
-                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all text-xs uppercase tracking-widest mt-4">
-                        Сохранить
+                    <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-95 active:scale-[0.98] text-white font-bold rounded-xl shadow-lg shadow-purple-500/10 transition-all text-xs uppercase tracking-widest mt-6">
+                        Внести в журнал
                     </button>
                 </form>
             </div>
         </div>
 
-        <div class="md:col-span-2">
-            <div class="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden">
-                <table class="w-full text-left text-sm text-white/70">
-                    <thead class="bg-white/5 text-white/40 text-[10px] uppercase tracking-widest border-b border-white/10">
-                        <tr>
-                            <th class="px-6 py-4 font-bold">Дата</th>
-                            <th class="px-6 py-4 font-bold">Вес (кг)</th>
-                            <th class="px-6 py-4 font-bold">Заметки</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5">
-                        {% for log in logs %}
-                        <tr class="hover:bg-white/5 transition-colors duration-200">
-                            <td class="px-6 py-4 font-bold text-white">{{ log.date|date:"d.m.Y" }}</td>
-                            <td class="px-6 py-4 font-black text-emerald-400">{{ log.body_weight }}</td>
-                            <td class="px-6 py-4 text-xs text-white/50">{{ log.notes|default:"—" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="3" class="px-6 py-10 text-center text-white/30 text-xs uppercase tracking-widest">Нет данных о весе.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="lg:col-span-2">
+            <div class="bg-[#11131e]/40 backdrop-blur-xl rounded-[2rem] border border-white/5 p-6 shadow-2xl">
+                <div class="flex justify-between items-center mb-6 px-2">
+                    <h3 class="text-xs font-bold text-white uppercase tracking-widest opacity-80">История взвешиваний</h3>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-white/70 border-separate border-spacing-y-3.5">
+                        <thead>
+                            <tr class="text-white/30 text-[10px] uppercase tracking-widest">
+                                <th class="px-6 pb-2 font-bold w-[20%]">Дата</th>
+                                <th class="px-6 pb-2 font-bold w-[25%]">Вес</th>
+                                <th class="px-6 pb-2 font-bold w-[40%]">Заметки</th>
+                                <th class="px-6 pb-2 font-bold w-[15%] text-right">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr class="bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-200 group">
+                                <td class="px-6 py-5 font-semibold text-white/90 rounded-l-2xl border-t border-b border-l border-white/5">
+                                    {{ log.date|date:"d.m.Y" }}
+                                </td>
+                                <td class="px-6 py-5 border-t border-b border-white/5">
+                                    <span class="font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 text-[15px] drop-shadow-[0_2px_10px_rgba(52,211,153,0.08)]">
+                                        {{ log.body_weight }} кг
+                                    </span>
+                                </td>
+                                <td class="px-6 py-5 text-xs text-white/40 max-w-[200px] truncate group-hover:text-white/60 transition-colors border-t border-b border-white/5">
+                                    {{ log.notes|default:"—" }}
+                                </td>
+                                <td class="px-6 py-5 text-right space-x-2 whitespace-nowrap rounded-r-2xl border-t border-b border-r border-white/5">
+                                    <a href="{% url 'analytics:edit_progress' log.pk %}" class="inline-flex p-2.5 bg-white/[0.02] hover:bg-white/[0.08] text-white/30 hover:text-white rounded-xl transition-all border border-white/5" title="Редактировать">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </a>
+                                    <form action="{% url 'analytics:delete_progress' log.pk %}" method="post" class="inline" onsubmit="return confirm('Вы уверены?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="p-2.5 bg-rose-500/5 hover:bg-rose-500/15 text-rose-400/40 hover:text-rose-400 rounded-xl transition-all border border-rose-500/10">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-16 text-center text-white/20 text-xs uppercase tracking-widest font-medium">
+                                    Нет записей о весе. Внесите замер слева!
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const canvasEl = document.getElementById('weightTrendChart');
+        if (!canvasEl) return;
+
+        const labels = JSON.parse(canvasEl.dataset.labels || '[]');
+        const data = JSON.parse(canvasEl.dataset.weights || '[]');
+
+        // --- ДИНАМИЧЕСКИЙ РАСЧЕТ И ЗАПОЛНЕНИЕ КАРТОЧЕК МЕТРИК ---
+        if (data.length > 0) {
+            // Данные отсортированы хронологически: [самый старый замер, ..., самый новый замер]
+            const oldestWeight = data[0];
+            const currentWeight = data[data.length - 1];
+            const minWeight = Math.min(...data);
+            const maxWeight = Math.max(...data);
+            const weightDiff = (currentWeight - oldestWeight).toFixed(1);
+
+            // 1. Заполняем текущий вес
+            document.getElementById('kpi-current').textContent = currentWeight.toLocaleString('ru-RU');
+
+            // 2. Рассчитываем и стилизуем общий прогресс
+            const diffEl = document.getElementById('kpi-diff');
+            const diffContainer = document.getElementById('kpi-diff-container');
+            
+            if (weightDiff < 0) {
+                diffEl.textContent = weightDiff.toLocaleString('ru-RU');
+                diffContainer.className = "text-3xl font-black mt-3 tracking-tight text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.15)]";
+            } else if (weightDiff > 0) {
+                diffEl.textContent = "+" + weightDiff.toLocaleString('ru-RU');
+                diffContainer.className = "text-3xl font-black mt-3 tracking-tight text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.15)]";
+            } else {
+                diffEl.textContent = "0";
+                diffContainer.className = "text-3xl font-black mt-3 tracking-tight text-white/60";
+            }
+
+            // 3. Заполняем пики
+            document.getElementById('kpi-min').textContent = minWeight.toLocaleString('ru-RU');
+            document.getElementById('kpi-max').textContent = maxWeight.toLocaleString('ru-RU');
+        }
+
+        // --- ОТРИСОВКА ГРАФИКА ---
+        const ctx = canvasEl.getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight || 300);
+        gradient.addColorStop(0, 'rgba(129, 140, 248, 0.25)');
+        gradient.addColorStop(0.5, 'rgba(139, 92, 246, 0.05)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Вес',
+                    data: data,
+                    borderColor: '#6366f1',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#4f46e5',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.4, 
+                    fill: true,
+                    backgroundColor: gradient
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.03)', borderDash: [5, 5] },
+                        ticks: { color: 'rgba(255, 255, 255, 0.3)', font: { size: 10 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: 'rgba(255, 255, 255, 0.3)', font: { size: 10 } }
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

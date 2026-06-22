@@ -7,7 +7,13 @@ class WorkoutForm(TailwindFormMixin, forms.ModelForm):
         model = Workout
         fields = ['date', 'type', 'duration_minutes']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date', 'class': 'w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl'}),
+            'date': forms.DateInput(
+                format='%Y-%m-%d', 
+                attrs={
+                    'type': 'date', 
+                    'class': 'w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl'
+                }
+            ),
             'type': forms.Select(attrs={'class': 'w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl'}),
             'duration_minutes': forms.NumberInput(attrs={'placeholder': 'Мин', 'class': 'w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl'}),
         }

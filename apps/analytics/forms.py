@@ -8,6 +8,7 @@ class UserProgressForm(TailwindFormMixin, forms.ModelForm):
         fields = ['date', 'body_weight', 'notes']
         widgets = {
             'date': forms.DateInput(
+                format='%Y-%m-%d',
                 attrs={
                     'type': 'date', 
                     'class': 'w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm text-white placeholder-white/30'

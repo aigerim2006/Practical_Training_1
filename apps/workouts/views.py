@@ -81,6 +81,55 @@ class AddWorkoutView(LoginRequiredMixin, View):
         # Если форма невалидна, она будет возвращена с ошибками и списком типов
         return render(request, 'workouts/workout_form.html', {'form': form})
 
+class UpdateWorkoutView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        # Берем только тренировку текущего пользователя
+        workout = get_object_or_404(Workout, pk=pk, user=request.user)
+        form = WorkoutForm(instance=workout)
+        # Передаем уже существующие упражнения, чтобы отобразить их в форме редактирования
+        exercises = workout.exercises.all()
+        return render(request, 'workouts/workout_form.html', {
+            'form': form, 
+            'workout': workout,
+            'exercises': exercises,
+            'is_edit': True
+        })
+
+    def post(self, request, pk):
+        workout = get_object_or_404(Workout, pk=pk, user=request.user)
+        form = WorkoutForm(request.POST, instance=workout)
+        if form.is_valid():
+            workout = form.save(commit=False)
+            
+            # Пересчет калорий на случай, если изменился тип или длительность
+            latest_weight_log = UserProgress.objects.filter(user=request.user, date__lte=workout.date).order_by('-date').first()
+            weight = latest_weight_log.body_weight if latest_weight_log else 70.0
+            
+            met = workout.type.met_coefficient
+            workout.calories_burned = round(float(met * 3.5 * weight / 200.0 * workout.duration_minutes), 1)
+            workout.save()
+
+            # Обновление упражнений: удаляем старые связи и записываем обновленные массивы
+            workout.exercises.all().delete()
+
+            names = request.POST.getlist('ex_name[]')
+            sets = request.POST.getlist('ex_sets[]')
+            reps = request.POST.getlist('ex_reps[]')
+            weights = request.POST.getlist('ex_weight[]')
+
+            for i in range(len(names)):
+                if names[i].strip():
+                    ExerciseLog.objects.create(
+                        workout=workout, 
+                        exercise_name=names[i].strip(),
+                        sets=int(sets[i] or 0), 
+                        reps=int(reps[i] or 0), 
+                        weight=float(weights[i] or 0)
+                    )
+            return redirect('workouts:workout_list')
+        
+        return render(request, 'workouts/workout_form.html', {'form': form, 'workout': workout, 'is_edit': True})
+
 class DeleteWorkoutView(LoginRequiredMixin, View):
     def post(self, request, pk):
         workout = get_object_or_404(Workout, pk=pk, user=request.user)
